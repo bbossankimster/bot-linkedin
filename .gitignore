@@ -1,3 +1,9 @@
+# My ignore rules
+settings.py
+.vscode
+keys/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
