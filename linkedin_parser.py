@@ -23,10 +23,6 @@ def parse_rqst(driver, url, filter_title):
     element = WebDriverWait(driver, 20).until(
         ec.presence_of_element_located((By.XPATH, ".//button[starts-with(@aria-label,'Page')]"))
         )
-    content = driver.page_source
-    fileToWrite = open("page_source.html", "w", encoding="utf-8")
-    fileToWrite.write(content)
-    fileToWrite.close()
     raw_data = []
     raw_data = driver.find_elements_by_xpath(".//div[@data-job-id]")
     job_content =  [i.text.split('\n') for i in raw_data]
@@ -81,7 +77,8 @@ def get_jobs(url, filter_title=None):
         print("ERROR!")
     #driver.quit()
     if pages > 1:
-        for i in range(1, pages):
+        # for i in range(1, pages):
+        for i in range(1, 2):
             step = 25*i
             next_url = url + '&start=' + str(step)
             #driver = webdriver.Chrome("C:\\__FROM_USB_2020\\_____PY_PROJECTS\\__BOTS\\bot-linkedin\\env\\Scripts\\chromedriver.exe", chrome_options=options)
@@ -99,18 +96,22 @@ def get_jobs(url, filter_title=None):
     print(summary_line)
     driver.quit()
     # sleep(160)
-    fileToWrite = open("result_python_jobs.txt", "w", encoding="utf-8")
-    fileToWrite.writelines(search_result)
-    fileToWrite.close()
     raw_data = []
     return search_result, links, summary_line
 
 
 if __name__ == "__main__":
     jobs, links, summary_line = get_jobs(PYTHON_URL, "Python")
+    fileToWrite = open("__result\\result_python_jobs.txt", "w", encoding="utf-8")
     for num in range(len(jobs)):
-        print(f'#{num} {jobs[num]}\n')
+        result = f'#{num} {jobs[num]}\n'
+        fileToWrite.write(result)
+        print(result, end="")
     print("\n")
     for num in range(len(links)):
-        print(f'#{num} {links[num]}')
+        result = f'#{num} {links[num]}\n'
+        fileToWrite.write(result)
+        print(result, end="")
     print(summary_line)
+    fileToWrite.write(summary_line)
+    fileToWrite.close()
