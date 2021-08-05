@@ -1,24 +1,20 @@
-linkedin = {
-    'session_key':'',
-    'session_password':''
-}
+API_KEY = "YOUR_API_KEY"
 
-facebook = {
-    'facebook_login': '',
-    'facebook_pass': ''
-}
+USERS = [USER_ID1, USER_ID2]
 
+WEBDRIVER = 'C:\\_____PY_PROJECTS\\__BOTS\\bot-linkedin\\env\\Scripts\\chromedriver.exe'
+WD_CACHE = 'C:\\__chromedriver\\cache'
 
-API_KEY = ""
-NAME = ""
-
-USERS = []
-CHAT_IDS = []
-
-LINKEDIN_URL = 'https://www.linkedin.com'
-LOGIN_URL = 'https://www.linkedin.com/login?fromSignIn=true&trk=guest_homepage-basic_nav-header-signin'
-CONNECTIONS_URL = 'https://www.linkedin.com/mynetwork/invite-connect/connections/'
-APL_LINK = 'https://www.linkedin.com/jobs/tracker/applied/'
 CCNP_URL = 'https://www.linkedin.com/jobs/search/?f_TP=1%2C2&f_TPR=r604800&keywords=ccnp&locationId=il%3A0&sortBy=DD'
-PYTHON_URL = 'https://www.linkedin.com/jobs/search/?f_CR=101620260&f_TPR=r604800&keywords=python%20developer&sortBy=R'
-CCIE_URL = 'https://www.linkedin.com/jobs/search/?f_TP=1%2C2&f_TPR=r604800&geoId=101620260&keywords=bgp&location=Israel&sortBy=DD'
+PYTHON_URL = 'https://www.linkedin.com/jobs/search/?f_CR=101620260&f_TPR=r604800&keywords=python%20developer&sortBy=DD'
+CCIE_URL = 'https://www.linkedin.com/jobs/search/?f_CR=101620260&f_TPR=r604800&keywords=ccie&sortBy=DD'
+
+# LANG = "ru"
+LANG = "en"
+
+button1 = ['keyword "ccnp"', 'По слову "ccnp"']
+button2 = ['keyword "ccie"', 'По слову "ccie"']
+button3 = ['empty', 'без поиска']
+button4 = ['keyword "python"', 'По слову "python"']
+
+BUTTONS = [button1, button2, button3, button4]

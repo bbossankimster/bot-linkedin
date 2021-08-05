@@ -1,5 +1,5 @@
 import requests
-from settings import CCIE_URL, CCNP_URL, PYTHON_URL, linkedin, LOGIN_URL, LINKEDIN_URL
+from settings import CCIE_URL, CCNP_URL, PYTHON_URL, LOGIN_URL, LINKEDIN_URL, WEBDRIVER, WD_CACHE
 from bs4 import BeautifulSoup
 
 from selenium.common.exceptions import NoSuchElementException
@@ -63,22 +63,25 @@ def parse_rqst(driver, url, filter_title):
     return search_result, links, pg_count
 
 def get_jobs(url, filter_title=None):
+    print("get_jobs")
     options = webdriver.ChromeOptions()
     options.add_argument('--allow-profiles-outside-user-dir')
     options.add_argument('--enable-profile-shortcut-manager')
-    options.add_argument(r'user-data-dir=C:\\__PYTHON')
+    options.add_argument(r'user-data-dir=' + WD_CACHE)
     options.add_argument(r'--disk-cache-dir=null')
     options.add_argument('--profile-directory=Profile 1')
-    driver = webdriver.Chrome("C:\\__FROM_USB_2020\\_____PY_PROJECTS\\__BOTS\\bot-linkedin\\env\\Scripts\\chromedriver.exe", chrome_options=options)
+    driver = webdriver.Chrome(WEBDRIVER, chrome_options=options)
+    print("get_jobs")
     search_result, links = [], []
+    # search_result, links, pages = parse_rqst(driver, url, filter_title)
     try:
         search_result, links, pages = parse_rqst(driver, url, filter_title)
     except Exception:
         print("ERROR!")
     #driver.quit()
     if pages > 1:
-        # for i in range(1, pages):
-        for i in range(1, 2):
+        for i in range(1, pages):
+        # for i in range(1, 2):
             step = 25*i
             next_url = url + '&start=' + str(step)
             #driver = webdriver.Chrome("C:\\__FROM_USB_2020\\_____PY_PROJECTS\\__BOTS\\bot-linkedin\\env\\Scripts\\chromedriver.exe", chrome_options=options)

@@ -1,0 +1,5 @@
+bs4
+pip-chill
+python-telegram-bot
+selenium
+webdriver-manager
