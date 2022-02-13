@@ -6,6 +6,15 @@ import datetime
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup, KeyboardButton
 
+from selenium.common.exceptions import NoSuchElementException
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.support import expected_conditions as ec
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from settings import WEBDRIVER, WD_CACHE
+
 
 logging.basicConfig(
     handlers=[logging.FileHandler('bot.log', 'a', 'utf-8')],
@@ -56,8 +65,10 @@ def main():
     dp.add_handler(MessageHandler(Filters.regex(BUTTONS[3][1]), python_title))
     dp.add_handler(MessageHandler(Filters.regex('^(python_все)$'), python_all))
     logging.info("Бот стартовал!!!")
+
     mybot.start_polling()
     mybot.idle()
+
 
 
 def user_enable(context):

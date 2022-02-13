@@ -2,15 +2,15 @@ import requests
 from settings import CCIE_URL, CCNP_URL, PYTHON_URL, LOGIN_URL, LINKEDIN_URL, WEBDRIVER, WD_CACHE
 from bs4 import BeautifulSoup
 
+from time import sleep
+from tools.webdriver import start_chrome
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.common.exceptions import NoSuchElementException
-from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support import expected_conditions as ec
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from time import sleep
-
+from tools.search_result import prepare_dict, get_new_jobs
 
 
 def parse_rqst(driver, url, filter_title):
@@ -44,6 +44,7 @@ def parse_rqst(driver, url, filter_title):
     pages_count = driver.find_elements_by_xpath(".//button[starts-with(@aria-label,'Page')]")
     pg_count = int(pages_count[-1].text)
     search_result = []
+    result_data_list = []
     links = []
     print("name {}, date {}, location {}, title {}".format(len(company_name), len(job_date), len(job_location), len(job_title)))
     job_count = len(job_date)
@@ -53,68 +54,87 @@ def parse_rqst(driver, url, filter_title):
         c = job_location[j]
         d = job_title[j].title()
         e = job_link[j]
+        result_data = {}
+        result_data = {
+            "job_date": a,
+            "company_name": b,
+            "job_location": c,
+            "job_title": d,
+            "job_link": e}
         if filter_title is None:
             search_result.append('{}\n{}\n{}\n{}\n'.format(d,b,a,c))
             links.append(e)
+            result_data_list.append(result_data)
         else:
             if filter_title in job_title[j].title():
                 search_result.append('{}\n{}\n{}\n{}\n'.format(d,b,a,c))
                 links.append(e)
-    return search_result, links, pg_count
+                result_data_list.append(result_data)
+    #print(search_result[0])
+    #print(links[0])
+    print("pg_count", pg_count)
+    return search_result, links, pg_count, result_data_list
+
 
 def get_jobs(url, filter_title=None):
     print("get_jobs")
-    options = webdriver.ChromeOptions()
-    options.add_argument('--allow-profiles-outside-user-dir')
-    options.add_argument('--enable-profile-shortcut-manager')
-    options.add_argument(r'user-data-dir=' + WD_CACHE)
-    options.add_argument(r'--disk-cache-dir=null')
-    options.add_argument('--profile-directory=Profile 1')
-    driver = webdriver.Chrome(WEBDRIVER, chrome_options=options)
+    driver = start_chrome()
     print("get_jobs")
-    search_result, links = [], []
+    search_result, links, result_data_list = [], [], []
     # search_result, links, pages = parse_rqst(driver, url, filter_title)
     try:
-        search_result, links, pages = parse_rqst(driver, url, filter_title)
-    except Exception:
-        print("ERROR!")
+        search_result, links, pages, result_data_list = parse_rqst(driver, url, filter_title)
+    except Exception as e:
+        print("Exception ERROR (parse main page)!", e)
     #driver.quit()
+    print("pages")
     if pages > 1:
-        for i in range(1, pages):
-        # for i in range(1, 2):
+        # for i in range(1, pages):
+        for i in range(1, 2):
             step = 25*i
             next_url = url + '&start=' + str(step)
-            #driver = webdriver.Chrome("C:\\__FROM_USB_2020\\_____PY_PROJECTS\\__BOTS\\bot-linkedin\\env\\Scripts\\chromedriver.exe", chrome_options=options)
             try:
-                tmp_result, tmp_links, tmp_pages = parse_rqst(driver, next_url, filter_title)
+                tmp_result, tmp_links, tmp_pages, tmp_result_data_list = parse_rqst(driver, next_url, filter_title)
             #driver.quit()
-            except Exception:
-                print("ERROR!")
+            except Exception as e:
+                print("Exception error! LinkedIn page result: {}(from {})\n{}".format(i+1, pages, e))
             else:
+                print("Done! LinkedIn page result: {}(from {})\n".format(i+1, pages))
                 search_result = search_result + tmp_result
                 links = links + tmp_links
-                print("Поиск... Страница {} из {}".format(i+1, pages))
+                result_data_list = result_data_list + tmp_result_data_list
+                
     res_count = len(search_result)
     summary_line = f"\n\nСкрипт выполнен.\nНайдено вакансий: {res_count}\n"
     print(summary_line)
     driver.quit()
     # sleep(160)
     raw_data = []
-    return search_result, links, summary_line
+    return search_result, links, summary_line, result_data_list
 
 
-if __name__ == "__main__":
-    jobs, links, summary_line = get_jobs(PYTHON_URL, "Python")
-    fileToWrite = open("__result\\result_python_jobs.txt", "w", encoding="utf-8")
+if __name__ == "__main__1":
+    jobs, links, summary_line, jobs_data_list = get_jobs(PYTHON_URL, "Python")
+    fileToWrite = open("result_python_jobs.txt", "w", encoding="utf-8")
+    print("\n\n>>> Final result (jobs):\n")
     for num in range(len(jobs)):
         result = f'#{num} {jobs[num]}\n'
         fileToWrite.write(result)
         print(result, end="")
     print("\n")
+    print("\n\n>>> Final result (links):\n")
     for num in range(len(links)):
         result = f'#{num} {links[num]}\n'
         fileToWrite.write(result)
         print(result, end="")
+    print("\n\n>>> Final result (summary_line):\n")
     print(summary_line)
     fileToWrite.write(summary_line)
     fileToWrite.close()
+    prepare_dict(jobs_data_list)
+
+
+if __name__ == "__main__":
+    jobs_data_list = [{'job_date': 'NEW', 'company_name': 'IBM', 'job_location': 'Khabarovsk', 'job_title': 'Driver', 'job_link': 'https://www.linkedin.com/jobs/view/2856179630/'}]
+    prepare_dict(jobs_data_list)
+    get_new_jobs()
